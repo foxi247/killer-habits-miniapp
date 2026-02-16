@@ -1,4 +1,4 @@
-// Наборы опросов: каждая запись — вопрос с весами ответов (чем больше, тем лучше результат)
+// Опросы: 10 вопросов, шкала 0-4
 const SURVEYS = {
   porn: {
     title: "Зависимость от порно",
@@ -62,7 +62,6 @@ const SURVEYS = {
   }
 };
 
-// Шкала ответов (чем левее, тем хуже контроль; чем правее — лучше)
 const ANSWER_OPTIONS = [
   { label: "Плохо", score: 0 },
   { label: "Скорее плохо", score: 1 },
@@ -84,10 +83,23 @@ const progressText = document.getElementById('progress-text');
 const resultScore = document.getElementById('result-score');
 const resultText = document.getElementById('result-text');
 const restartBtn = document.getElementById('restart-btn');
+const splash = document.getElementById('splash');
 
 let currentSurvey = null;
 let currentIndex = 0;
 let answers = [];
+
+function showCard(el) {
+  el.hidden = false;
+  requestAnimationFrame(() => {
+    el.classList.add('show');
+  });
+}
+
+function hideCard(el) {
+  el.classList.remove('show');
+  setTimeout(() => { el.hidden = true; }, 300);
+}
 
 function renderQuestion() {
   const q = currentSurvey.questions[currentIndex];
@@ -124,13 +136,18 @@ function calcResult() {
   resultText.textContent = text;
 }
 
+// Splash autohide
+setTimeout(() => {
+  splash.style.display = 'none';
+}, 2000);
+
 startBtn.addEventListener('click', () => {
   const key = surveySelect.value;
   currentSurvey = SURVEYS[key];
   currentIndex = 0;
   answers = new Array(currentSurvey.questions.length).fill(null);
-  questionCard.hidden = false;
-  resultCard.hidden = true;
+  showCard(questionCard);
+  hideCard(resultCard);
   renderQuestion();
 });
 
@@ -142,24 +159,22 @@ prevBtn.addEventListener('click', () => {
 });
 
 nextBtn.addEventListener('click', () => {
-  if (answers[currentIndex] == null) return; // не даём прыгать без ответа
+  if (answers[currentIndex] == null) return;
   if (currentIndex < currentSurvey.questions.length - 1) {
     currentIndex++;
     renderQuestion();
   } else {
-    // конец
     calcResult();
-    questionCard.hidden = true;
-    resultCard.hidden = false;
+    hideCard(questionCard);
+    showCard(resultCard);
   }
 });
 
 restartBtn.addEventListener('click', () => {
-  questionCard.hidden = true;
-  resultCard.hidden = true;
+  hideCard(resultCard);
+  hideCard(questionCard);
 });
 
-// Optional Telegram Web App hooks
 if (window.Telegram?.WebApp) {
   Telegram.WebApp.ready();
   Telegram.WebApp.expand();

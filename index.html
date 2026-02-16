@@ -14,10 +14,12 @@
             <div class="hero-title">Свобода от порно</div>
         </div>
 
-        <header class="header">
-            <h1>🧭 Опросник анти-зависимостей</h1>
-            <p>10 вопросов • быстрый скрининг • персональный итог</p>
-        </header>
+        <div class="splash" id="splash">
+            <div class="splash-content">
+                <div class="splash-title">Ты хочешь освободиться?</div>
+                <div class="splash-sub">2 секунды — и начнём</div>
+            </div>
+        </div>
 
         <div class="survey-picker">
             <label for="survey-select">Выбери опрос:</label>
@@ -30,7 +32,7 @@
             <button id="start-btn">Старт</button>
         </div>
 
-        <div class="card" id="question-card" hidden>
+        <div class="card card-animate" id="question-card" hidden>
             <div class="progress">
                 <div class="progress-bar" id="progress-bar"></div>
                 <span id="progress-text">0 / 10</span>
@@ -43,14 +45,14 @@
             </div>
         </div>
 
-        <div class="card" id="result-card" hidden>
+        <div class="card card-animate" id="result-card" hidden>
             <h2>Итог</h2>
             <p id="result-score">0%</p>
             <p id="result-text">Рекомендации появятся здесь.</p>
             <button id="restart-btn">Пройти ещё раз</button>
         </div>
 
-        <div class="card" id="courses-card">
+        <div class="card card-animate" id="courses-card">
             <h2>Курсы и доступ</h2>
             <div class="courses">
                 <div class="course-item">
