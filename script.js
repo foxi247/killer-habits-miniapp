@@ -1,52 +1,166 @@
-const DEFAULT_HABITS = [
-  "Прокрастинация","Чрезмерное использование соцсетей","Негативные мысли и самобичевание",
-  "Зависимость от гаджетов","Плохое питание","Отсутствие физической активности",
-  "Сон менее 7 часов","Избегание ответственности","Критика других","Гнев и раздражительность"
+// Наборы опросов: каждая запись — вопрос с весами ответов (чем больше, тем лучше результат)
+const SURVEYS = {
+  porn: {
+    title: "Зависимость от порно",
+    questions: [
+      "Как часто ты смотришь порно?",
+      "Используешь ли порно для снятия стресса?",
+      "Бывает ли, что порно мешает сну/работе/учёбе?",
+      "Испытываешь чувство вины после просмотра?",
+      "Есть ли эскалация (нужен всё более жёсткий контент)?",
+      "Пробовал(-а) сокращать просмотр за последнюю неделю?",
+      "Есть альтернативные способы расслабления (спорт, прогулки)?",
+      "Обсуждаешь проблему с кем-то (друг, психотерапевт)?",
+      "Бывает ли, что пропускаешь дела ради просмотра?",
+      "Как оцениваешь контроль над этим сейчас?"
+    ]
+  },
+  dopamine: {
+    title: "Дофаминовые ловушки",
+    questions: [
+      "Часто ли листаешь ленту/реелсы без цели?",
+      "Тянешься к сладкому/фастфуду при усталости?",
+      "Сколько времени тратится на короткие ролики в день?",
+      "Можешь ли обходиться без уведомлений 2–3 часа?",
+      "Испытываешь тревогу, если телефон далеко?",
+      "Есть ли план вознаграждений за выполненные задачи?",
+      "Практикуешь ли цифровой детокс?",
+      "Часто ли откладываешь важное ради быстрого удовольствия?",
+      "Есть ли у тебя чёткий распорядок дня?",
+      "Как оцениваешь контроль над дофаминовыми триггерами?"
+    ]
+  },
+  productivity: {
+    title: "Прокрастинация и дисциплина",
+    questions: [
+      "Часто ли откладываешь важные задачи до дедлайна?",
+      "Есть ли у тебя ежедневный список дел?",
+      "Сколько глубоких рабочих часов в день ты делаешь?",
+      "Проверяешь ли задачи в конце дня?",
+      "Отвлекаешься ли на соцсети во время работы?",
+      "Делишь ли большие задачи на мелкие шаги?",
+      "Есть ли у тебя утренний ритуал?",
+      "Планируешь ли день заранее (вечером)?",
+      "Как часто выполняешь обещания себе?",
+      "Как оцениваешь свою дисциплину сейчас?"
+    ]
+  },
+  social: {
+    title: "Соцсети и гаджеты",
+    questions: [
+      "Сколько часов в день в соцсетях?",
+      "Часто ли проверяешь уведомления автоматически?",
+      "Есть ли лимиты экранного времени?",
+      "Используешь ли режим «Не беспокоить»?",
+      "Как часто листаешь ленту без цели?",
+      "Откладываешь ли телефон за 1 час до сна?",
+      "Есть ли офлайн-хобби без экрана?",
+      "Общение вживую заменяется перепиской?",
+      "Часто ли берёшь телефон на встречах?",
+      "Как оцениваешь контроль над гаджетами?"
+    ]
+  }
+};
+
+// Шкала ответов (чем левее, тем хуже контроль; чем правее — лучше)
+const ANSWER_OPTIONS = [
+  { label: "Плохо", score: 0 },
+  { label: "Скорее плохо", score: 1 },
+  { label: "Нейтрально", score: 2 },
+  { label: "Скорее хорошо", score: 3 },
+  { label: "Отлично", score: 4 }
 ];
 
-const checklistEl = document.getElementById('checklist');
-const habitsTotalEl = document.getElementById('habits-total');
-const habitsDoneEl = document.getElementById('habits-done');
-const progressEl = document.getElementById('progress');
+const surveySelect = document.getElementById('survey-select');
+const startBtn = document.getElementById('start-btn');
+const questionCard = document.getElementById('question-card');
+const resultCard = document.getElementById('result-card');
+const questionText = document.getElementById('question-text');
+const answersEl = document.getElementById('answers');
+const prevBtn = document.getElementById('prev-btn');
+const nextBtn = document.getElementById('next-btn');
+const progressBar = document.getElementById('progress-bar');
+const progressText = document.getElementById('progress-text');
+const resultScore = document.getElementById('result-score');
+const resultText = document.getElementById('result-text');
+const restartBtn = document.getElementById('restart-btn');
 
-let habits = JSON.parse(localStorage.getItem('habits')) || DEFAULT_HABITS.map(text => ({ text, done: false }));
+let currentSurvey = null;
+let currentIndex = 0;
+let answers = [];
 
-function updateStats() {
-  const total = habits.length;
-  const done = habits.filter(h => h.done).length;
-  const progress = total > 0 ? Math.round((done / total) * 100) : 0;
-  habitsTotalEl.textContent = total;
-  habitsDoneEl.textContent = done;
-  progressEl.textContent = `${progress}%`;
-}
-
-function renderHabits() {
-  checklistEl.innerHTML = '';
-  habits.forEach((habit, index) => {
-    const habitEl = document.createElement('div');
-    habitEl.className = 'habit-item';
-    habitEl.dataset.index = index;
-    habitEl.innerHTML = `
-      <div class="habit-checkbox">
-        <input type="checkbox" ${habit.done ? 'checked' : ''}>
-      </div>
-      <div class="habit-text ${habit.done ? 'done' : ''}">${habit.text}</div>
-    `;
-    checklistEl.appendChild(habitEl);
-    const checkbox = habitEl.querySelector('input[type="checkbox"]');
-    checkbox.addEventListener('change', () => {
-      habits[index].done = checkbox.checked;
-      localStorage.setItem('habits', JSON.stringify(habits));
-      renderHabits();
-      updateStats();
+function renderQuestion() {
+  const q = currentSurvey.questions[currentIndex];
+  questionText.textContent = q;
+  answersEl.innerHTML = '';
+  ANSWER_OPTIONS.forEach((opt, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'answer-btn';
+    btn.textContent = opt.label;
+    if (answers[currentIndex] === idx) btn.classList.add('selected');
+    btn.addEventListener('click', () => {
+      answers[currentIndex] = idx;
+      renderQuestion();
     });
+    answersEl.appendChild(btn);
   });
-  setTimeout(() => {
-    document.querySelectorAll('.habit-item').forEach(el => el.classList.add('fade-in'));
-  }, 100);
+  const progress = Math.round(((currentIndex + 1) / currentSurvey.questions.length) * 100);
+  progressBar.style.setProperty('--w', progress + '%');
+  progressText.textContent = `${currentIndex + 1} / ${currentSurvey.questions.length}`;
+  prevBtn.disabled = currentIndex === 0;
+  nextBtn.textContent = currentIndex === currentSurvey.questions.length - 1 ? 'Завершить' : 'Далее';
 }
 
-updateStats();
-renderHabits();
-// Telegram Web App hooks (на будущее):
-// if (window.Telegram?.WebApp) { Telegram.WebApp.ready(); Telegram.WebApp.expand(); }
+function calcResult() {
+  const maxScore = currentSurvey.questions.length * (ANSWER_OPTIONS.length - 1);
+  const sumScore = answers.reduce((acc, val) => acc + (val ?? 0), 0);
+  const percent = Math.round((sumScore / maxScore) * 100);
+  resultScore.textContent = `${percent}%`;
+  let text = '';
+  if (percent >= 80) text = 'Хороший контроль. Продолжай в том же духе, усиливай поддерживающие привычки.';
+  else if (percent >= 60) text = 'Неплохо, но есть риски. Сокращай триггеры, добавь альтернативы (спорт, сон, живое общение).';
+  else if (percent >= 40) text = 'Средний контроль. Введи жёсткие лимиты, убери уведомления, договорись с собой о правилах.';
+  else text = 'Риск высокий. Нужен план: убрать триггеры, чёткий режим, поддержка (куратор/терапевт). Начни с одного шага уже сегодня.';
+  resultText.textContent = text;
+}
+
+startBtn.addEventListener('click', () => {
+  const key = surveySelect.value;
+  currentSurvey = SURVEYS[key];
+  currentIndex = 0;
+  answers = new Array(currentSurvey.questions.length).fill(null);
+  questionCard.hidden = false;
+  resultCard.hidden = true;
+  renderQuestion();
+});
+
+prevBtn.addEventListener('click', () => {
+  if (currentIndex > 0) {
+    currentIndex--;
+    renderQuestion();
+  }
+});
+
+nextBtn.addEventListener('click', () => {
+  if (answers[currentIndex] == null) return; // не даём прыгать без ответа
+  if (currentIndex < currentSurvey.questions.length - 1) {
+    currentIndex++;
+    renderQuestion();
+  } else {
+    // конец
+    calcResult();
+    questionCard.hidden = true;
+    resultCard.hidden = false;
+  }
+});
+
+restartBtn.addEventListener('click', () => {
+  questionCard.hidden = true;
+  resultCard.hidden = true;
+});
+
+// Optional Telegram Web App hooks
+if (window.Telegram?.WebApp) {
+  Telegram.WebApp.ready();
+  Telegram.WebApp.expand();
+}
