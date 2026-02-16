@@ -84,6 +84,7 @@ const resultScore = document.getElementById('result-score');
 const resultText = document.getElementById('result-text');
 const restartBtn = document.getElementById('restart-btn');
 const splash = document.getElementById('splash');
+const coursesCard = document.getElementById('courses-card');
 
 let currentSurvey = null;
 let currentIndex = 0;
@@ -139,6 +140,8 @@ function calcResult() {
 // Splash autohide
 setTimeout(() => {
   splash.style.display = 'none';
+  // показать курсы после заставки
+  if (coursesCard) coursesCard.classList.add('show');
 }, 2000);
 
 startBtn.addEventListener('click', () => {
