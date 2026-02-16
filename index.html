@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Убийца привычек | Telegram Mini App</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <h1>💀 Убийца привычек</h1>
+      <p>Отказ от вредных привычек, зависимостей и грехов</p>
+    </header>
+
+    <div class="stats">
+      <div class="stat-item">
+        <span class="stat-value" id="habits-total">0</span>
+        <span class="stat-label">Привычек всего</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value" id="habits-done">0</span>
+        <span class="stat-label">Побеждено</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value" id="progress">0%</span>
+        <span class="stat-label">Прогресс</span>
+      </div>
+    </div>
+
+    <div class="checklist" id="checklist"></div>
+
+    <footer class="footer">
+      <p>© 2026 Убийца привычек. Для личного использования.</p>
+    </footer>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
